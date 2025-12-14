@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Responsive Time Letter Display</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: system-ui, Arial, sans-serif;
+        background: black;
+    }
+
+    .container {
+        display: flex;
+        width: 100%;
+        height: 100svh; /* Safe viewport height */
+    }
+
+    .half {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        font-weight: 800;
+        font-size: clamp(8rem, 30vw, 22rem); /* Responsive scaling */
+        line-height: 1;
+        text-align: center;
+    }
+
+    .left {
+        background: #1e3a8a;
+        color: #ffffff;
+    }
+
+    .right {
+        background: #7c2d12;
+        color: #ffffff;
+    }
+
+    /* Portrait mode (phones) */
+    @media (orientation: portrait) {
+        .container {
+            flex-direction: column;
+        }
+        .half {
+            width: 100%;
+            height: 50%;
+            font-size: clamp(6rem, 35vw, 18rem);
+        }
+    }
+
+    /* Ultra-wide screens */
+    @media (min-aspect-ratio: 21/9) {
+        .half {
+            font-size: clamp(10rem, 25vw, 26rem);
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="half left" id="letter24">A</div>
+    <div class="half right" id="letter12">A</div>
+</div>
+
+<script>
+    let lastMinute = -1;
+
+    function getLetter(timeStr) {
+        let sum = 0;
+        for (let c of timeStr) sum += c - '0';
+        return String.fromCharCode(65 + (sum - 1) % 26);
+    }
+
+    function update() {
+        const now = new Date();
+        const min = now.getMinutes();
+
+        if (min !== lastMinute) {
+            lastMinute = min;
+            const m = String(min).padStart(2, '0');
+
+            const h24 = String(now.getHours()).padStart(2, '0');
+            document.getElementById("letter24").textContent =
+                getLetter(h24 + m);
+
+            let h12 = now.getHours() % 12 || 12;
+            h12 = String(h12).padStart(2, '0');
+            document.getElementById("letter12").textContent =
+                getLetter(h12 + m);
+        }
+    }
+
+    update();
+    setInterval(update, 1000);
+</script>
+
+</body>
+</html>
